@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Collections.Generic;
 using Mooege.Common;
 using Mooege.Common.Helpers;
@@ -37,6 +38,7 @@ namespace Mooege.Core.GS.Game
         static readonly Logger Logger = LogManager.CreateLogger();
 
         public PlayerManager PlayerManager { get; private set; }
+        public PowersManager PowersManager { get; private set; }
 
         private Dictionary<uint, DynamicObject> Objects;
         // NOTE: This tracks by WorldSNO rather than by DynamicID; this.Objects _does_ still contain the world since it is a DynamicObject
@@ -44,6 +46,9 @@ namespace Mooege.Core.GS.Game
 
         public int StartWorldSNO { get; private set; }
         public World StartWorld { get { return GetWorld(this.StartWorldSNO); } }
+
+        public readonly int TicksPerSecond = 30;
+        private Thread _tickThread;
 
         private readonly WorldGenerator WorldGenerator;
 
@@ -62,8 +67,26 @@ namespace Mooege.Core.GS.Game
             this.Worlds = new Dictionary<int, World>();
             this.PlayerManager = new PlayerManager(this);
             this.WorldGenerator = new WorldGenerator(this);
+            this.PowersManager = new PowersManager(this);
             // FIXME: This must be set according to the game settings (start quest/act). Better yet, track the player's save point and toss this stuff
             this.StartWorldSNO = 71150;
+
+            //Quick implementation of gametick
+            _tickThread = new Thread(() => _tickThread_Run());
+            _tickThread.Start();
+        }
+
+        public void _tickThread_Run()
+        {
+            // TODO: needs to have exit condition, probably either PlayerManager.Players.Count or a manual shutdown flag
+            while (true)
+            {
+                lock (this)
+                {
+                    PowersManager.Tick();
+                }
+                Thread.Sleep(1000 / TicksPerSecond);
+            }
         }
 
         public void Route(GameClient client, GameMessage message)

@@ -22,25 +22,25 @@ namespace Mooege.Net.GS.Message.Definitions.Effect
 {
     public class EffectGroupACDToACDMessage : GameMessage
     {
-        public int /* sno */ Field0;
-        public int Field1;
-        public int Field2;
+        public int effectSNO;
+        public uint fromActorID;
+        public uint toActorID;
 
 
 
 
         public override void Parse(GameBitBuffer buffer)
         {
-            Field0 = buffer.ReadInt(32);
-            Field1 = buffer.ReadInt(32);
-            Field2 = buffer.ReadInt(32);
+            effectSNO = buffer.ReadInt(32);
+            fromActorID = buffer.ReadUInt(32);
+            toActorID = buffer.ReadUInt(32);
         }
 
         public override void Encode(GameBitBuffer buffer)
         {
-            buffer.WriteInt(32, Field0);
-            buffer.WriteInt(32, Field1);
-            buffer.WriteInt(32, Field2);
+            buffer.WriteInt(32, effectSNO);
+            buffer.WriteUInt(32, fromActorID);
+            buffer.WriteUInt(32, toActorID);
         }
 
         public override void AsText(StringBuilder b, int pad)
@@ -49,9 +49,9 @@ namespace Mooege.Net.GS.Message.Definitions.Effect
             b.AppendLine("EffectGroupACDToACDMessage:");
             b.Append(' ', pad++);
             b.AppendLine("{");
-            b.Append(' ', pad); b.AppendLine("Field0: 0x" + Field0.ToString("X8"));
-            b.Append(' ', pad); b.AppendLine("Field1: 0x" + Field1.ToString("X8") + " (" + Field1 + ")");
-            b.Append(' ', pad); b.AppendLine("Field2: 0x" + Field2.ToString("X8") + " (" + Field2 + ")");
+            b.Append(' ', pad); b.AppendLine("Field0: 0x" + effectSNO.ToString("X8"));
+            b.Append(' ', pad); b.AppendLine("Field1: 0x" + fromActorID.ToString("X8") + " (" + fromActorID + ")");
+            b.Append(' ', pad); b.AppendLine("Field2: 0x" + toActorID.ToString("X8") + " (" + toActorID + ")");
             b.Append(' ', --pad);
             b.AppendLine("}");
         }

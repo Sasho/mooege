@@ -31,7 +31,7 @@ namespace Mooege.Net.GS.Message.Definitions.ACD
     })]
     public class ACDTranslateNormalMessage : GameMessage, ISelfHandler
     {
-        public int Field0; // TODO: Confirm that this is the actor ID
+        public uint ActorID; 
         public Vector3D Position;
         public float /* angle */? Angle;
         public bool? Field3;
@@ -86,7 +86,7 @@ namespace Mooege.Net.GS.Message.Definitions.ACD
 
         public override void Parse(GameBitBuffer buffer)
         {
-            Field0 = buffer.ReadInt(32);
+            ActorID = buffer.ReadUInt(32);
             if (buffer.ReadBool())
             {
                 Position = new Vector3D();
@@ -120,7 +120,7 @@ namespace Mooege.Net.GS.Message.Definitions.ACD
 
         public override void Encode(GameBitBuffer buffer)
         {
-            buffer.WriteInt(32, Field0);
+            buffer.WriteUInt(32, ActorID);
             buffer.WriteBool(Position != null);
             if (Position != null)
             {
@@ -164,7 +164,7 @@ namespace Mooege.Net.GS.Message.Definitions.ACD
             b.AppendLine("ACDTranslateNormalMessage:");
             b.Append(' ', pad++);
             b.AppendLine("{");
-            b.Append(' ', pad); b.AppendLine("Field0: 0x" + Field0.ToString("X8"));
+            b.Append(' ', pad); b.AppendLine("Field0: 0x" + ActorID.ToString("X8"));
             if (Position != null)
             {
                 Position.AsText(b, pad);

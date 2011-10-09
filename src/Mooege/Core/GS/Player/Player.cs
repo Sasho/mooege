@@ -377,11 +377,14 @@ namespace Mooege.Core.GS.Player
         // Message handlers
         private void OnObjectTargeted(GameClient client, TargetMessage message)
         {
-            Actor actor = this.World.GetActor(message.TargetID);
+           /* Actor actor = this.World.GetActor(message.TargetID);
             if (actor != null)
                 actor.OnTargeted(this);
             else
-                Logger.Warn("Player targeted an invalid object (ID = {0})", message.TargetID);
+                Logger.Warn("Player targeted an invalid object (ID = {0})", message.TargetID);*/
+
+            //Temp route to powermanager
+            this.World.Game.PowersManager.Manage(this, message);
         }
 
         private void OnPlayerChangeHotbarButtonMessage(GameClient client, PlayerChangeHotbarButtonMessage message)
