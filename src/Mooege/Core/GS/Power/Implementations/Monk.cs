@@ -13,7 +13,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x00017713/*Skills.Skills.Monk.SpiritGenerator.DeadlyReach*/)]
     public class MonkDeadlyReach : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             /*if (pp.Message.Field5 == 0)
                 fx.PlayEffectGroupActorToActor(71921, pp.User, fx.SpawnTempProxy(pp.User, pp.TargetPosition));
@@ -35,7 +35,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x000176C4/*Skills.Skills.Monk.SpiritGenerator.FistsOfThunder*/)]
     public class MonkFistsOfThunder : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             /*if (pp.Message.Field5 == 0)
                 fx.PlayEffectGroupActorToActor(96176, pp.User, fx.SpawnTempProxy(pp.User, pp.TargetPosition));
@@ -57,7 +57,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x000179B6/*Skills.Skills.Monk.SpiritSpenders.SevenSidedStrike*/)]
     public class MonkSevenSidedStrike : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             /*Vector3D startpos;
             if (pp.Target == null)
@@ -86,7 +86,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x00017837/*Skills.Skills.Monk.SpiritGenerator.CripplingWave*/)]
     public class MonkCripplingWave : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             /*if (pp.Message.Field5 == 0)
                 fx.PlayEffectGroupActorToActor(18987, pp.User, fx.SpawnTempProxy(pp.User, pp.TargetPosition));
@@ -119,7 +119,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x00017C30/*Skills.Skills.Monk.SpiritGenerator.ExplodingPalm*/)]
     public class MonkExplodingPalm : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             /*if (pp.Message.Field5 == 0)
                 fx.PlayEffectGroupActorToActor(142471, pp.User, fx.SpawnTempProxy(pp.User, pp.TargetPosition));
@@ -141,7 +141,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x0001775A/*Skills.Skills.Monk.SpiritGenerator.SweepingWind*/)]
     public class MonkSweepingWind : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             // TODO: make buffs disappear so skill can be implemented
             //if (pp.Message.Field5 == 0)

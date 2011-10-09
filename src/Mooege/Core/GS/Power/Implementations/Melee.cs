@@ -11,12 +11,12 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x00007780/*Skills.Skills.BasicAttack*/)]
     public class Melee : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager pm)
         {
-            if (fx.WillHitMeleeTarget(pp.User, pp.Target))
+            if (pm.fx.getDistance(pp.User.Position, pp.Target.Position) > pm.meleeRange)
             {
-                fx.PlayHitEffect(HitEffect.Flash, pp.User, pp.Target);
-                fx.DoDamage(pp.Target, 25f, DamageType.Normal_fast);
+                pm.fx.PlayHitEffect(HitEffect.Flash, pp.User, pp.Target);
+                pm.DoDamage(pp.Target, 25f, DamageType.Normal_fast);
             }
             yield break;
         }

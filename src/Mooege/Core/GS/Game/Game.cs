@@ -38,7 +38,7 @@ namespace Mooege.Core.GS.Game
         static readonly Logger Logger = LogManager.CreateLogger();
 
         public PlayerManager PlayerManager { get; private set; }
-        public PowersManager PowersManager { get; private set; }
+        public PowerManager PowerManager { get; private set; }
 
         private Dictionary<uint, DynamicObject> Objects;
         // NOTE: This tracks by WorldSNO rather than by DynamicID; this.Objects _does_ still contain the world since it is a DynamicObject
@@ -67,7 +67,7 @@ namespace Mooege.Core.GS.Game
             this.Worlds = new Dictionary<int, World>();
             this.PlayerManager = new PlayerManager(this);
             this.WorldGenerator = new WorldGenerator(this);
-            this.PowersManager = new PowersManager(this);
+            this.PowerManager = new PowerManager(this);
             // FIXME: This must be set according to the game settings (start quest/act). Better yet, track the player's save point and toss this stuff
             this.StartWorldSNO = 71150;
 
@@ -83,7 +83,7 @@ namespace Mooege.Core.GS.Game
             {
                 lock (this)
                 {
-                    PowersManager.Tick();
+                    PowerManager.Tick();
                 }
                 Thread.Sleep(1000 / TicksPerSecond);
             }

@@ -91,7 +91,8 @@ namespace Mooege.Core.GS.Actors
 
         public override void OnTargeted(Mooege.Core.GS.Player.Player player)
         {
-            this.Die(player);
+            //this.Die(player);
+            //Temp route to powermanager
         }
 
         public override void Reveal(Mooege.Core.GS.Player.Player player)

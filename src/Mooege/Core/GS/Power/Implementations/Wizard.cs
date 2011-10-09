@@ -13,7 +13,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x00010E46/*Skills.Skills.Wizard.Offensive.Meteor*/)]
     public class WizardMeteor : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             /*fx.SpawnEffect(pp.User, 86790, pp.TargetPosition);
             yield return 2000;
@@ -29,7 +29,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x000006E5/*Skills.Skills.Wizard.Signature.Electrocute*/)]
     public class WizardElectrocute : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             /*fx.RegisterChannelingPower(pp.User, 150);
 
@@ -70,7 +70,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x00007818/*Skills.Skills.Wizard.Signature.MagicMissile*/)]
     public class WizardMagicMissile : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             // HACK: made up spell, not real magic missile
             /*for (int step = 1; step < 10; ++step)
@@ -93,7 +93,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x00007805/*Skills.Skills.Wizard.Offensive.Hydra*/)]
     public class WizardHydra : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             // HACK: made up demonic meteor spell, not real hydra
             /*fx.SpawnEffect(pp.User, 185366, pp.TargetPosition);
@@ -108,7 +108,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x0001659D/*Skills.Skills.Wizard.Offensive.Disintegrate*/)]
     public class WizardDisintegrate : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             /*fx.RegisterChannelingPower(pp.User);
 
@@ -128,7 +128,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x0000784C/*Skills.Skills.Wizard.Offensive.WaveOfForce*/)]
     public class WizardWaveOfForce : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
             /*yield return 350;
             fx.PlayEffectGroupActorToActor(19356, pp.User, fx.SpawnTempProxy(pp.User, pp.User.Position));
@@ -146,7 +146,7 @@ namespace Mooege.Core.GS.Powers.Implementations
     [PowerImplementationAttribute(0x00020D38/*Skills.Skills.Wizard.Offensive.ArcaneTorrent*/)]
     public class WizardArcaneTorrent : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
         {
            /* fx.RegisterChannelingPower(pp.User, 200);
 

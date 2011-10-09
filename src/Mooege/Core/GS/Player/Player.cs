@@ -143,7 +143,7 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.IsTrialActor] = true;
             this.Attributes[GameAttribute.Buff_Visual_Effect, 0xFFFFF] = true;
             this.Attributes[GameAttribute.Crit_Percent_Cap] = 0x3F400000;
-            this.Attributes[GameAttribute.Resource_Cur, this.ResourceID] = 200f;
+            this.Attributes[GameAttribute.Resource_Cur, this.ResourceID] = 100f;
             this.Attributes[GameAttribute.Resource_Max, this.ResourceID] = 200f;
             this.Attributes[GameAttribute.Resource_Max_Total, this.ResourceID] = 200f;
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total_All] = 2f;
@@ -377,14 +377,13 @@ namespace Mooege.Core.GS.Player
         // Message handlers
         private void OnObjectTargeted(GameClient client, TargetMessage message)
         {
-           /* Actor actor = this.World.GetActor(message.TargetID);
+            /*Actor actor = this.World.GetActor(message.TargetID);
             if (actor != null)
-                actor.OnTargeted(this);
+                actor.OnTargeted(this, message);
             else
                 Logger.Warn("Player targeted an invalid object (ID = {0})", message.TargetID);*/
 
-            //Temp route to powermanager
-            this.World.Game.PowersManager.Manage(this, message);
+            this.World.Game.PowerManager.Manage(this, message);
         }
 
         private void OnPlayerChangeHotbarButtonMessage(GameClient client, PlayerChangeHotbarButtonMessage message)

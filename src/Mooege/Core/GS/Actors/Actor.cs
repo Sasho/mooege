@@ -59,7 +59,8 @@ namespace Mooege.Core.GS.Actors
         NPC,
         Monster,
         Item,
-        Portal
+        Portal,
+        Effect
     }
 
     // Base actor
@@ -184,9 +185,75 @@ namespace Mooege.Core.GS.Actors
         {
         }
 
-        public virtual void OnTargeted(Mooege.Core.GS.Player.Player player)
+        public virtual void OnTargeted(Mooege.Core.GS.Player.Player players)
         {
         }
+
+        #region setAttribute
+
+        //HACK, work for the moment
+        public void setAttribute(GameClient playerClient, GameAttributeB attribute, GameAttributeValue value, int attributeKey = 0)
+        {
+            GameAttributeMap gam = new GameAttributeMap();
+            
+            //Update server actor
+            if (attributeKey > 0)
+            {
+                this.Attributes[attribute, attributeKey] = value.ValueB;
+                gam[attribute, attributeKey] = value.ValueB;
+            }
+            else
+            {
+                this.Attributes[attribute] = value.ValueB;
+                gam[attribute] = value.ValueB;
+            }
+
+            gam.SendMessage(playerClient, this.DynamicID);
+        }
+
+        //HACK, work for the moment
+        public void setAttribute(GameClient playerClient, GameAttributeI attribute, GameAttributeValue value, int attributeKey = 0)
+        {
+            GameAttributeMap gam = new GameAttributeMap();
+
+            //Update server actor
+            if (attributeKey > 0)
+            {
+                this.Attributes[attribute, attributeKey] = value.Value;
+                gam[attribute, attributeKey] = value.Value;
+            }
+            else
+            {
+                this.Attributes[attribute] = value.Value;
+                gam[attribute] = value.Value;
+            }
+
+            gam.SendMessage(playerClient, this.DynamicID);
+        }
+
+        //HACK, work for the moment
+        public void setAttribute(GameClient playerClient, GameAttributeF attribute, GameAttributeValue value, int attributeKey = 0)
+        {
+            GameAttributeMap gam = new GameAttributeMap();
+
+            Console.Write("Sending new attribute value");
+
+            //Update server actor
+            if (attributeKey > 0)
+            {
+                this.Attributes[attribute, attributeKey] = value.ValueF;
+                gam[attribute, attributeKey] = value.ValueF;
+            }
+            else
+            {
+                this.Attributes[attribute] = value.ValueF;
+                gam[attribute] = value.ValueF;
+            }
+
+            gam.SendMessage(playerClient, this.DynamicID);
+        }
+
+        #endregion
 
         public override void Reveal(Mooege.Core.GS.Player.Player player)
         {
