@@ -16,5 +16,6 @@ namespace Mooege.Core.GS.Powers
         public TargetMessage Message;
         public bool UserIsChanneling;
         public bool ThrottledCast;
+        public int SwingSide;
     }
 }

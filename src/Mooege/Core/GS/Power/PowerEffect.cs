@@ -9,6 +9,7 @@ using Mooege.Net.GS.Message.Definitions.Effect;
 using Mooege.Net.GS;
 using Mooege.Net.GS.Message;
 using Mooege.Net.GS.Message.Definitions.Misc;
+using Mooege.Net.GS.Message.Definitions.Animation;
 
 namespace Mooege.Core.GS.Powers
 {
@@ -31,6 +32,37 @@ namespace Mooege.Core.GS.Powers
 
                 SendDWordTick(player.InGameClient);
             }
+        }
+
+        public void PlayAnimation(Actor actor, int animationId)
+        {
+            if (actor == null) return;
+
+            foreach (Mooege.Core.GS.Player.Player player in actor.World.GetPlayersInRange(actor.Position, 150f))
+            {
+                //Stop actor current animation
+                player.InGameClient.SendMessage(new ANNDataMessage(Opcodes.ANNDataMessage13)
+                {
+                    ActorID = actor.DynamicID
+                });
+
+                player.InGameClient.SendMessage(new PlayAnimationMessage()
+                {
+                    ActorID = actor.DynamicID,
+                    Field1 = 0xb,
+                    Field2 = 0,
+                    tAnim = new PlayAnimationMessageSpec[1]
+                    {
+                        new PlayAnimationMessageSpec()
+                        {
+                            Field0 = 0x2,
+                            Field1 = animationId,
+                            Field2 = 0x0,
+                            Field3 = 0.6f
+                        }
+                    }
+                });
+            } 
         }
 
         public void PlayHitEffect(HitEffect id, Actor target, Actor from)
@@ -69,7 +101,7 @@ namespace Mooege.Core.GS.Powers
                     Position = pos,
                     Angle = angle, // TODO: convert quaternion rotation for this?
                     Field3 = false,
-                    Field4 = 0.6f,
+                    Field4 = 2000f,
                 });
 
                 SendDWordTick(player.InGameClient);
@@ -104,8 +136,8 @@ namespace Mooege.Core.GS.Powers
             // TODO: figure out how to implement with amount
             Vector3D move = new Vector3D();
             move.Z = target.Position.Z;
-            move.X = target.Position.X + (target.Position.X - user.Position.X);
-            move.Y = target.Position.Y + (target.Position.Y - user.Position.Y);
+            move.X = target.Position.X + (target.Position.X - user.Position.X) * amount;
+            move.Y = target.Position.Y + (target.Position.Y - user.Position.Y) * amount;
             MoveActorNormal(user, target, move, getRadian(target.Position, user.Position));
         }
         #endregion

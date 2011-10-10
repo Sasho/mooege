@@ -24,7 +24,7 @@ using Mooege.Net.GS.Message.Fields;
 
 namespace Mooege.Net.GS.Message.Definitions.Animation
 {
-    [IncomingMessage(Opcodes.SecondaryAnimationPowerMessage)]
+    [IncomingMessage(Opcodes.SecondaryAnimationPowerMessage, Consumers.Player)]
     public class SecondaryAnimationPowerMessage : GameMessage,ISelfHandler
     {
         public int /* sno */ PowerSNO;

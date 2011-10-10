@@ -37,7 +37,7 @@ namespace Mooege.Net.GS.Message
         public static readonly GameAttributeI Armor_Item_Percent = new GameAttributeI(29, 0, -1, 0, 0, "", "0", "Armor_Item_Percent", GameAttributeEncoding.Int, 9, 0, 0, 32);
         public static readonly GameAttributeI Armor_Item_SubTotal = new GameAttributeI(30, 0, -1, 0, 0, "FLOOR((Armor_Item + Armor_Bonus_Item) * (Armor_Item_Percent + 1))", "", "Armor_Item_SubTotal", GameAttributeEncoding.Int, 9, 0, 0, 32);
         public static readonly GameAttributeI Armor_Item_Total = new GameAttributeI(31, 0, -1, 0, 0, "(Armor_Item > 0)?(Max(Armor_Item_SubTotal, 1)):Armor_Item_SubTotal", "", "Armor_Item_Total", GameAttributeEncoding.Int, 9, 0, 0, 32);
-        public static readonly GameAttributeI Armor_Total = new GameAttributeI(32, 0, -1, 0, 0, "", "FLOOR((Armor + Armor_Item_Total) * (Armor_Bonus_Percent + 1))", "Armor_Total", GameAttributeEncoding.Int, 9, 0, 0, 32);
+        public static readonly GameAttributeF Armor_Total = new GameAttributeF(32, 0, -1, 0, 0, "", "FLOOR((Armor + Armor_Item_Total) * (Armor_Bonus_Percent + 1))", "Armor_Total", GameAttributeEncoding.Float16Or32, 9, 0, 0, 32);
         public static readonly GameAttributeI Experience_Granted = new GameAttributeI(33, 0, -1, 0, 1, "", "", "Experience_Granted", GameAttributeEncoding.Int, 1, 0, 0, 32);
         public static readonly GameAttributeI Experience_Next = new GameAttributeI(34, 0, -1, 0, 1, "", "", "Experience_Next", GameAttributeEncoding.Int, 1, 0, 0, 32);
         public static readonly GameAttributeI Gold_Granted = new GameAttributeI(35, 0, -1, 0, 1, "", "", "Gold_Granted", GameAttributeEncoding.Int, 9, 0, 0, 32);

@@ -71,12 +71,35 @@ namespace Mooege.Core.GS.Game
 
         List<WaitingPower> _waitingPowers = new List<WaitingPower>();
 
-        public void Manage(Mooege.Core.GS.Player.Player player, TargetMessage message)
+        public void Manage(Mooege.Core.GS.Player.Player player, GameMessage gameMessage)
         {
             //Extract message information
-            int snoPower = message.PowerSNO;
-            uint targetID = message.TargetID;
-            WorldPlace cursor = message.Field2;
+            int snoPower;
+            uint targetID;
+            WorldPlace cursor;
+            Actor target;
+            int swingSide;
+            
+            //Target message
+            if (gameMessage.Id == 80)
+            {
+                TargetMessage message = (TargetMessage)gameMessage;
+                snoPower = message.PowerSNO;
+                targetID = message.TargetID;
+                cursor = message.Field2;
+                target = player.World.GetActor(message.TargetID);
+                swingSide = message.Field6 == null ? 0 : message.Field6.Field0;
+            }
+            //SecondaryAnimationPowerMessage
+            else
+            {
+                SecondaryAnimationPowerMessage message = (SecondaryAnimationPowerMessage)gameMessage;
+                snoPower = message.PowerSNO;
+                targetID = 0;
+                cursor = new WorldPlace();
+                target = player.World.GetActor(0);
+                swingSide = 0;
+            }
 
             if (snoPower == Skills.Skills.Barbarian.FuryGenerators.LeapAttack) // HACK: intercepted to use for spawning test mobs
             {
@@ -86,8 +109,6 @@ namespace Mooege.Core.GS.Game
             }
             else
             {
-                Actor target = player.World.GetActor(message.TargetID);
-
                 // find and run a power implementation
                 var implementation = PowerImplementation.ImplementationForId(snoPower);
 
@@ -113,10 +134,10 @@ namespace Mooege.Core.GS.Game
                     {
                         User = player,
                         Target = target,
-                        TargetPosition = cursor,
-                        Message = message,
+                        TargetPosition = cursor,                        
                         UserIsChanneling = userIsChanneling,
                         ThrottledCast = throttledCast,
+                        SwingSide = swingSide
                     },
                     this);
 

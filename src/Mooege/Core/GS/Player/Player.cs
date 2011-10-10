@@ -38,6 +38,7 @@ using Mooege.Net.GS.Message.Definitions.Combat;
 using Mooege.Net.GS.Message.Definitions.Game;
 using Mooege.Net.GS.Message.Definitions.Hero;
 using Mooege.Net.GS.Message.Definitions.Misc;
+using Mooege.Net.GS.Message.Definitions.Animation;
 using Mooege.Net.GS.Message.Definitions.Player;
 using Mooege.Net.GS.Message.Definitions.Skill;
 using Mooege.Net.GS.Message.Definitions.Inventory;
@@ -246,7 +247,7 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.Level] = this.Properties.Level;
             this.Attributes[GameAttribute.Experience_Next] = 1200;
             this.Attributes[GameAttribute.Experience_Granted] = 1000;
-            this.Attributes[GameAttribute.Armor_Total] = 0;
+            this.Attributes[GameAttribute.Armor_Total] = 500f;
             this.Attributes[GameAttribute.Defense] = 10f;
             this.Attributes[GameAttribute.Buff_Icon_Count0, 0x00033C40] = 1;
             this.Attributes[GameAttribute.Vitality] = 9f;
@@ -281,7 +282,8 @@ namespace Mooege.Core.GS.Player
             if (message is AssignActiveSkillMessage) OnAssignActiveSkill(client, (AssignActiveSkillMessage)message);
             else if (message is AssignPassiveSkillMessage) OnAssignPassiveSkill(client, (AssignPassiveSkillMessage)message);
             else if (message is PlayerChangeHotbarButtonMessage) OnPlayerChangeHotbarButtonMessage(client, (PlayerChangeHotbarButtonMessage)message);
-            else if (message is TargetMessage) OnObjectTargeted(client, (TargetMessage)message);
+            else if (message is TargetMessage) OnObjectTargeted(client, message);
+            else if (message is SecondaryAnimationPowerMessage) OnObjectTargeted(client, message);
             else return;
 
             UpdateState();
@@ -346,7 +348,7 @@ namespace Mooege.Core.GS.Player
         }
 
         // Message handlers
-        private void OnObjectTargeted(GameClient client, TargetMessage message)
+        private void OnObjectTargeted(GameClient client, GameMessage message)
         {
             /*Actor actor = this.World.GetActor(message.TargetID);
             if (actor != null)
@@ -356,7 +358,6 @@ namespace Mooege.Core.GS.Player
                 Logger.Warn("Player targeted an invalid object (ID = {0})", message.TargetID);*/
 
             this.World.Game.PowerManager.Manage(this, message);
-
         }
 
         private void OnPlayerChangeHotbarButtonMessage(GameClient client, PlayerChangeHotbarButtonMessage message)

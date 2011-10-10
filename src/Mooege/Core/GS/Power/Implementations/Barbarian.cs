@@ -53,7 +53,7 @@ namespace Mooege.Core.GS.Powers.Implementations
             yield return 200; //Synchronize with weapon swing
 
             //pp.Message.Field6.Field0 = swing side
-            if(pp.Message.Field6.Field0 == 3) {
+            if(pp.SwingSide == 3) {
                 pm.fx.PlayEffectGroupActorToActor(18671, pp.User, pp.Target);
             } else {
                 pm.fx.PlayEffectGroupActorToActor(18672, pp.User, pp.Target);
@@ -181,6 +181,9 @@ namespace Mooege.Core.GS.Powers.Implementations
                 pp.User.Properties.furyStack++;
             }
 
+            //Regenerate ressource
+            pm.generateRessource(pp.User, 3);
+
             yield return 4000;
 
             if (pp.User.Properties.furyStack > 0)
@@ -197,47 +200,96 @@ namespace Mooege.Core.GS.Powers.Implementations
         }
     }
 
-    /*
-    //[PowerImplementationAttribute(0x00013ECC/*Skills.Skills.Barbarian.FuryGenerator.Warcry*)]
-    /*public class BarbarianWarCry : PowerImplementation
+    
+    [PowerImplementationAttribute(Skills.Skills.Barbarian.FuryGenerators.WarCry)]
+    public class BarbarianWarCry : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager pm)
         {
             //Warcry effect
-            fx.PlayEffectGroupActorToActor(18664, pp.User, pp.User);
+            pm.fx.PlayEffectGroupActorToActor(18664, pp.User, pp.User);
 
-            foreach (Actor actor in fx.FindHeroInRadius(pp.User, 15f))
-            {                
+            List<Mooege.Core.GS.Player.Player> affectedPlayer = pp.User.World.GetPlayersInRange(pp.User.Position, 17f);
+
+            foreach (Actor actor in affectedPlayer)
+            {
                 //Add 100% armor bonus
-                fx.ActorSetAttribute(actor, GameAttribute.Armor_Total.Id, actor.gameAttributes[GameAttribute.Armor_Total].Value * 2, 60000, actor.gameAttributes[GameAttribute.Armor_Total].Value / 2);
-                actor.gameAttributes[GameAttribute.Armor_Total] = new GameAttributeValue(actor.gameAttributes[GameAttribute.Armor_Total].Value * 2);
+                actor.setAttribute(GameAttribute.Armor_Total, new GameAttributeValue(pp.User.Attributes.GetAttributeValue(GameAttribute.Armor_Total, null).ValueF * 2));
+            }
+            
+            //Set skill on Colldown
+            pp.User.setAttribute(GameAttribute.Power_Disabled, new GameAttributeValue(true), Skills.Skills.Barbarian.FuryGenerators.WarCry);
+            pm.SendDWordTick(pp.User.InGameClient);
+            pm.flushAll(pp.User);
+
+            yield return 30000;
+
+            //Set skill on Colldown
+            pp.User.setAttribute(GameAttribute.Power_Disabled, new GameAttributeValue(false), Skills.Skills.Barbarian.FuryGenerators.WarCry);
+            pm.SendDWordTick(pp.User.InGameClient);
+            pm.flushAll(pp.User);
+
+            yield return 30000;
+
+            foreach (Actor actor in affectedPlayer)
+            {
+                //Remove 100% armor bonus
+                actor.setAttribute(GameAttribute.Armor_Total, new GameAttributeValue(pp.User.Attributes.GetAttributeValue(GameAttribute.Armor_Total, null).ValueF / 2));
             }
 
-            yield break;
+            pm.SendDWordTick(pp.User.InGameClient);
+            pm.flushAll(pp.User);
         }
-    }*/
+    }
 
-   // [PowerImplementationAttribute(0x00017C9B/*Skills.Skills.Barbarian.FuryGenerator.FuriousCharge*/)]
-    /*public class BarbarianFuriousCharge : PowerImplementation
+    [PowerImplementationAttribute(Skills.Skills.Barbarian.FuryGenerators.FuriousCharge)]
+    public class BarbarianFuriousCharge : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager pm)
         {
+            IList<Actor> inlineMonster = pm.FindActorsInFront(pp.User, pp.TargetPosition.Position, 20, pm.fx.getDistance(pp.User.Position, pp.TargetPosition.Position));
+
             //Add start effect
-            //fx.PlayEffectGroupActorToActor(18680, pp.User, pp.User);
+            pm.fx.PlayEffectGroupActorToActor(18680, pp.User, pp.User);
+
+            //Play charge anim
+            pm.fx.PlayAnimation(pp.User, 116118);
 
             //Move targe
-            //fx.MoveActorNormal(pp.User, pp.TargetPosition);
-            fx.SpawnEffect(pp.User, 166221, pp.User.Position, -1, 500);
-
-
+            pm.fx.MoveActorNormal(pp.User, pp.User, pp.TargetPosition.Position, pm.fx.getRadian(pp.TargetPosition.Position, pp.User.Position));
+            
             //Play end effect
-            fx.PlayEffectGroupActorToActor(18679, pp.User, pp.User);
+            pm.fx.PlayEffectGroupActorToActor(18679, pp.User, pp.User);
 
-            //Calculate monster in path
+            foreach (Actor target in inlineMonster)
+            {
+                pm.DoDamage(target, 20f, FloatingNumberMessage.FloatType.White);
+            }
 
-            //Calculate monster affected by knockback
+            foreach (Actor target in pp.User.World.GetActorsInRange(pp.TargetPosition.Position, 10f))
+            {
+                pm.DoDamage(target, 20f, FloatingNumberMessage.FloatType.White);
+                pm.fx.DoKnockback(pp.User, target, 2);
+            }
 
-            yield break;
+            //Play charge anim
+            pm.fx.PlayAnimation(pp.User, 116117);
+
+            //Regenerate ressource
+            pm.generateRessource(pp.User, 15);
+
+            //Set skill on Colldown
+            pp.User.setAttribute(GameAttribute.Power_Disabled, new GameAttributeValue(true), Skills.Skills.Barbarian.FuryGenerators.FuriousCharge);
+
+            pm.SendDWordTick(pp.User.InGameClient);
+            pm.flushAll(pp.User);
+
+            yield return 15000;
+
+            //Set skill on Colldown
+            pp.User.setAttribute(GameAttribute.Power_Disabled, new GameAttributeValue(true), Skills.Skills.Barbarian.FuryGenerators.FuriousCharge);
+            pm.SendDWordTick(pp.User.InGameClient);
+            pm.flushAll(pp.User);
         }
-    }*/
+    }
 }
