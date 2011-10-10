@@ -184,7 +184,7 @@ namespace Mooege.Core.GS.Game
         }
                 
         //Temp dmg visual should not be there
-        public void DoDamage(Actor target, float amount, DamageType type)
+        public void DoDamage(Actor target, float amount, FloatingNumberMessage.FloatType type)
         {
             foreach (Mooege.Core.GS.Player.Player player in target.World.GetPlayersInRange(target.Position, 150f))
             {
@@ -193,7 +193,7 @@ namespace Mooege.Core.GS.Game
                     Id = 0xd0,
                     ActorID = target.DynamicID,
                     Number = amount,
-                    Field2 = (int)type,
+                    Type = type,
                 });
 
                 SendDWordTick(player.InGameClient);

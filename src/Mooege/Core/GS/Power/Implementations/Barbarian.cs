@@ -32,7 +32,7 @@ namespace Mooege.Core.GS.Powers.Implementations
             pm.fx.PlayHitEffect(HitEffect.Flash, pp.Target, pp.User);
 
             //Tmp dmg
-            pm.DoDamage(pp.Target, 30f, DamageType.Normal_fast);
+            pm.DoDamage(pp.Target, 30f, FloatingNumberMessage.FloatType.White);
                         
             //Regenerate ressource
             pm.generateRessource(pp.User, 6);

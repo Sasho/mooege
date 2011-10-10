@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -107,6 +107,8 @@
     <Compile Include="Core\GS\Power\PowerImplementation.cs" />
     <Compile Include="Core\GS\Power\PowerImplementationAttribute.cs" />
     <Compile Include="Core\GS\Power\PowerParameters.cs" />
+    <Compile Include="Core\GS\Player\Equipment.cs" />
+    <Compile Include="Core\GS\Player\Stash.cs" />
     <Compile Include="Core\MooNet\Accounts\Account.cs" />
     <Compile Include="Core\MooNet\Accounts\AccountManager.cs" />
     <Compile Include="Core\GS\Actors\Actor.cs" />
@@ -124,7 +126,7 @@
     <Compile Include="Core\MooNet\Helpers\NotificationTypeHelper.cs" />
     <Compile Include="Common\Helpers\RandomHelper.cs" />
     <Compile Include="Core\Common\Items\Item.cs" />
-    <Compile Include="Core\Common\Items\ItemTypeGenerator.cs" />
+    <Compile Include="Core\Common\Items\ItemGenerator.cs" />
     <Compile Include="Core\GS\Map\Portal.cs" />
     <Compile Include="Core\GS\Map\Scene.cs" />
     <Compile Include="Core\GS\Map\World.cs" />
@@ -162,6 +164,11 @@
     <Compile Include="Core\GS\Data\SNO\Database.cs" />
     <Compile Include="Core\GS\Data\SNO\Set.cs" />
     <Compile Include="Net\GS\Message\Definitions\Inventory\InventoryDropItemMessage.cs" />
+    <Compile Include="Net\GS\Message\Definitions\Misc\OpenSharedStashMessage.cs" />
+    <Compile Include="Net\GS\Message\Definitions\Misc\OpenTradeWindow.cs" />
+    <Compile Include="Net\GS\Message\Definitions\Misc\RequestBuyItemMessage.cs" />
+    <Compile Include="Net\GS\Message\Definitions\Misc\RequestBuySharedStashSlots.cs" />
+    <Compile Include="Net\GS\Message\Definitions\Misc\RequestSellItemMessage.cs" />
     <Compile Include="Net\GS\Message\GameAttribute.Array.cs" />
     <Compile Include="Net\GS\Message\GameAttribute.List.cs" />
     <Compile Include="Net\GS\Message\GameAttributeMap.cs" />
@@ -491,5 +498,4 @@
       <Name>LibMooNet</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
 </Project>

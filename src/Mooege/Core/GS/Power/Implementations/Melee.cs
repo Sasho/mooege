@@ -5,6 +5,7 @@ using System.Text;
 using Mooege.Core.GS.Skills;
 using Mooege.Core.GS.Game;
 using Mooege.Core.GS.Powers;
+using Mooege.Net.GS.Message.Definitions.Misc;
 
 namespace Mooege.Core.GS.Powers.Implementations
 {
@@ -16,7 +17,7 @@ namespace Mooege.Core.GS.Powers.Implementations
             if (pm.fx.getDistance(pp.User.Position, pp.Target.Position) > pm.meleeRange)
             {
                 pm.fx.PlayHitEffect(HitEffect.Flash, pp.User, pp.Target);
-                pm.DoDamage(pp.Target, 25f, DamageType.Normal_fast);
+                pm.DoDamage(pp.Target, 25f, FloatingNumberMessage.FloatType.White);
             }
             yield break;
         }

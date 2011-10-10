@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Mooege.Common;
@@ -84,6 +85,7 @@ namespace Mooege.Core.GS.Player
             this.Scale = ModelScale;
             this.RotationAmount = 0.05940768f;
             this.RotationAxis = new Vector3D(0f, 0f, 0.9982339f);
+            this.CollFlags = 0x00000000;
 
             this.Position.X = 3143.75f;
             this.Position.Y = 2828.75f;
@@ -255,6 +257,22 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.General_Cooldown] = 0;
             #endregion // Attributes
 
+            // Notify the client of the new player
+            this.InGameClient.SendMessage(new NewPlayerMessage
+            {
+                Field0 = 0x00000000, //Party frame (0x00000000 hide, 0x00000001 show)
+                Field1 = "", //Owner name?
+                ToonName = this.Properties.Name,
+                Field3 = 0x00000002, //party frame class
+                Field4 = 0x00000004, //party frame level
+                snoActorPortrait = this.ClassSNO, //party frame portrait
+                Field6 = 0x00000001,
+                StateData = this.GetStateData(),
+                Field8 = false, //announce party join
+                Field9 = 0x00000001,
+                ActorID = this.DynamicID,
+            });
+
             this.World.Enter(this); // Enter only once all fields have been initialized to prevent a run condition
         }
 
@@ -271,82 +289,9 @@ namespace Mooege.Core.GS.Player
         }
 
         // FIXME: Hardcoded crap
-        // FIXME: The new player stuff only needs to be called when the player joins the game
         public override void OnEnter(World world)
         {
             this.World.Reveal(this);
-
-            // Notify the client of the new player
-            InGameClient.SendMessage(new NewPlayerMessage
-            {
-                Field0 = 0x00000000, //Party frame (0x00000000 hide, 0x00000001 show)
-                Field1 = "", //Owner name?
-                ToonName = this.Properties.Name,
-                Field3 = 0x00000002, //party frame class
-                Field4 = 0x00000004, //party frame level
-                snoActorPortrait = this.ClassSNO, //party frame portrait
-                Field6 = 0x00000001,
-                StateData = this.GetStateData(),
-                Field8 = false, //announce party join
-                Field9 = 0x00000001,
-                ActorID = this.DynamicID,
-            });
-
-            InGameClient.SendMessage(new ACDCollFlagsMessage
-            {
-                ActorID = this.DynamicID,
-                CollFlags = 0x00000000,
-            });
-
-            this.Attributes.SendMessage(InGameClient, this.DynamicID);
-
-            // TODO: Pretty sure most of this stuff can be (and probably should be) put into Actor.Reveal()
-            this.InGameClient.SendMessage(new ACDGroupMessage()
-            {
-                ActorID = this.DynamicID,
-                Field1 = -1,
-                Field2 = -1,
-            });
-
-            this.InGameClient.SendMessage(new ANNDataMessage(Opcodes.ANNDataMessage7)
-            {
-                ActorID = this.DynamicID,
-            });
-
-            this.InGameClient.SendMessage(new ACDTranslateFacingMessage(Opcodes.ACDTranslateFacingMessage1)
-            {
-                ActorID = this.DynamicID,
-                Angle = 3.022712f,
-                Field2 = false,
-            });
-
-            this.InGameClient.SendMessage(new PlayerEnterKnownMessage()
-            {
-                Field0 = 0x00000000,
-                PlayerID = this.DynamicID,
-            });
-
-            this.InGameClient.SendMessage(new PlayerActorSetInitialMessage()
-            {
-                PlayerID = this.DynamicID,
-                Field1 = 0x00000000,
-            });
-
-            this.InGameClient.SendMessage(new SNONameDataMessage()
-            {
-                Name = new SNOName()
-                {
-                    Group = 0x00000001,
-                    Handle = this.ClassSNO,
-                },
-            });
-            this.InGameClient.FlushOutgoingBuffer();
-
-            this.InGameClient.SendMessage(new PlayerWarpedMessage()
-            {
-                Field0 = 9,
-                Field1 = 0f,
-            });
 
             // This "tick" stuff is somehow required to use these values.. /komiga
             this.InGameClient.SendMessage(new DWordDataMessage() // TICK
@@ -374,16 +319,44 @@ namespace Mooege.Core.GS.Player
         {
         }
 
+        public override bool Reveal(Mooege.Core.GS.Player.Player player)
+        {
+            if (!base.Reveal(player))
+                return false;
+
+            player.InGameClient.SendMessage(new PlayerWarpedMessage()
+            {
+                Field0 = 9,
+                Field1 = 0f,
+            });
+
+            player.InGameClient.SendMessage(new PlayerEnterKnownMessage()
+            {
+                Field0 = 0x00000000,
+                PlayerID = this.DynamicID,
+            });
+
+            player.InGameClient.SendMessage(new PlayerActorSetInitialMessage()
+            {
+                PlayerID = this.DynamicID,
+                Field1 = 0x00000000,
+            });
+            player.InGameClient.FlushOutgoingBuffer();
+            return true;
+        }
+
         // Message handlers
         private void OnObjectTargeted(GameClient client, TargetMessage message)
         {
             /*Actor actor = this.World.GetActor(message.TargetID);
             if (actor != null)
+
                 actor.OnTargeted(this, message);
             else
                 Logger.Warn("Player targeted an invalid object (ID = {0})", message.TargetID);*/
 
             this.World.Game.PowerManager.Manage(this, message);
+
         }
 
         private void OnPlayerChangeHotbarButtonMessage(GameClient client, PlayerChangeHotbarButtonMessage message)
@@ -415,6 +388,28 @@ namespace Mooege.Core.GS.Player
                 State = this.GetStateData()
             });
 
+            this.InGameClient.PacketId += 10 * 2;
+            this.InGameClient.SendMessage(new DWordDataMessage()
+            {
+                Id = 0x89,
+                Field0 = this.InGameClient.PacketId,
+            });
+        }
+
+        public void RegenRessource(float amount)
+        {
+            setAttribute(this.InGameClient, GameAttribute.Resource_Cur, new GameAttributeValue(Math.Min(amount + this.Attributes[GameAttribute.Resource_Cur, this.ResourceID], this.Attributes[GameAttribute.Resource_Max, this.ResourceID])), this.ResourceID);
+            SendDWordTick();
+        }
+
+        public void UserRessource(float amount)
+        {
+            setAttribute(this.InGameClient, GameAttribute.Resource_Cur, new GameAttributeValue(Math.Max(this.Attributes[GameAttribute.Resource_Cur, this.ResourceID] - amount, 0)), this.ResourceID);
+            SendDWordTick();
+        }
+
+        public void SendDWordTick()
+        {
             this.InGameClient.PacketId += 10 * 2;
             this.InGameClient.SendMessage(new DWordDataMessage()
             {
