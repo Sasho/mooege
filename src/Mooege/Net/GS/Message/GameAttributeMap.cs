@@ -152,7 +152,7 @@ namespace Mooege.Net.GS.Message
             return messageList;
         }
 
-        GameAttributeValue GetAttributeValue(GameAttribute attribute, int? key)
+        public GameAttributeValue GetAttributeValue(GameAttribute attribute, int? key)
         {
             KeyId keyid;
             keyid.Id = attribute.Id;

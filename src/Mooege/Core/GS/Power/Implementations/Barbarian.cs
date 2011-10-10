@@ -42,57 +42,91 @@ namespace Mooege.Core.GS.Powers.Implementations
         }
     }
 
-    //[PowerImplementationAttribute(Skills.Skills.Barbarian.FuryGenerators.Cleave)]
-    /*public class BarbarianCleave : PowerImplementation
+    [PowerImplementationAttribute(Skills.Skills.Barbarian.FuryGenerators.Cleave)]
+    public class BarbarianCleave : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowersManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager pm)
         {
             //Need in range selected target
-            if (pp.Target == null || !fx.WillHitMeleeTarget(pp.User, pp.Target)) { yield break; }
+            if (pp.Target == null || pm.fx.getDistance(pp.User.Position, pp.Target.Position) > pm.meleeRange) { yield break; }
 
             yield return 200; //Synchronize with weapon swing
 
             //pp.Message.Field6.Field0 = swing side
             if(pp.Message.Field6.Field0 == 3) {
-                fx.PlayEffectGroupActorToActor(18671, pp.User, pp.Target);
+                pm.fx.PlayEffectGroupActorToActor(18671, pp.User, pp.Target);
             } else {
-                fx.PlayEffectGroupActorToActor(18672, pp.User, pp.Target);
+                pm.fx.PlayEffectGroupActorToActor(18672, pp.User, pp.Target);
             }
 
-            IList<Actor> hits = fx.FindActorsInFront(pp.User, pp.Target.Position, 180f, 15f);
+            IList<Actor> hits = pm.FindActorsInFront(pp.User, pp.Target.Position, 180f, 10f);
             foreach (Actor actor in hits)
             {
-                fx.DoDamage(actor, 20, DamageType.Normal_fast);
+                //Must not be other player either will need fix
+                if(actor.DynamicID != pp.User.DynamicID)
+                    pm.DoDamage(actor, 20, FloatingNumberMessage.FloatType.White);
             }
 
-            //Flush all player buffer
-            fx.flushAll(pp.User);
-        }
-    }*/
+            //Regenerate ressource
+            pm.generateRessource(pp.User, 4);
 
-    //[PowerImplementationAttribute(Skills.Skills.Barbarian.FuryGenerators.GroundStomp)]
-    /*public class BarbarianGroundStomp : PowerImplementation
+            //Flush all player buffer
+            pm.flushAll(pp.User);
+        }
+    }
+
+    [PowerImplementationAttribute(Skills.Skills.Barbarian.FuryGenerators.GroundStomp)]
+    public class BarbarianGroundStomp : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowerManager pm, PowersEffect fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager pm)
         {
             yield return 150;
 
-            fx.PlayEffectGroupActorToActor(18685, pp.User, pp.User);
+            pm.fx.PlayEffectGroupActorToActor(18685, pp.User, pp.User);
 
-            foreach (Actor actor in pp.User.World.GetActorsInRange(pp.User.Position, 17f))
+            //Regenerate ressource
+            pm.generateRessource(pp.User, 15);
+
+            List<Actor> targetList = pp.User.World.GetActorsInRange(pp.User.Position, 17f);
+
+            //Add stunt effect
+            foreach (Actor actor in targetList)
             {
                 if (actor.DynamicID != pp.User.DynamicID)
                 {
+                    pm.DoDamage(actor, 20f, FloatingNumberMessage.FloatType.White);
                     actor.setAttribute(GameAttribute.Stunned, new GameAttributeValue(true));
-                    fx.AddTemporaryAttribute();
-                    fx.DoDamage(actor, 20, DamageType.Normal_fast);
                 }
             }
 
-            //Flush all player buffer
-            fx.flushAll(pp.User);
+            //Set skill on Colldown
+            pp.User.setAttribute(GameAttribute.Power_Disabled, new GameAttributeValue(true), Skills.Skills.Barbarian.FuryGenerators.GroundStomp);
+            pm.SendDWordTick(pp.User.InGameClient);
+            pm.flushAll(pp.User);
+
+            yield return 3000;
+            
+            //Remove stunt effect after 3sec
+            foreach (Actor actor in targetList)
+            {
+                if (actor.DynamicID != pp.User.DynamicID)
+                {
+                    actor.setAttribute(GameAttribute.Stunned, new GameAttributeValue(false));
+                }
+            }
+
+            pm.SendDWordTick(pp.User.InGameClient);
+
+            yield return 9000;
+
+            //Remove skill cooldown
+            pp.User.setAttribute(GameAttribute.Power_Disabled, new GameAttributeValue(false), Skills.Skills.Barbarian.FuryGenerators.GroundStomp);
+            pm.SendDWordTick(pp.User.InGameClient);
+            pm.flushAll(pp.User);
+            
         }
-    }*/
+    }
+
     /*
     //On hold, need to figure out how arctranslate work
     //[PowerImplementationAttribute(0x00016CE1/*Skills.Skills.Barbarian.FuryGenerator.Leap*)]
@@ -120,30 +154,50 @@ namespace Mooege.Core.GS.Powers.Implementations
     }*/
     
 
-    //[PowerImplementationAttribute(Skills.Skills.Barbarian.FuryGenerators.Frenzy)]
-    /*public class BarbarianFrenzy : PowerImplementation
+    [PowerImplementationAttribute(Skills.Skills.Barbarian.FuryGenerators.Frenzy)]
+    public class BarbarianFrenzy : PowerImplementation
     {
-        public override IEnumerable<int> Run(PowerParameters pp, PowerManager fx)
+        public override IEnumerable<int> Run(PowerParameters pp, PowerManager pm)
         {
-            //Is target in melee range ?
-            //if (pp.Target == null || !fx.WillHitMeleeTarget(pp.User, pp.Target)) { yield break; }
-            
+            Console.Write("Fury stack : " + pp.User.Properties.furyStack + "\r\n");
+
+            //Need in range selected target
+            if (pp.Target == null || pm.fx.getDistance(pp.User.Position, pp.Target.Position) > pm.meleeRange) { yield break; }
+
             //Spawn frenzy effect
             //fx.SpawnEffect(pp.User, 3291, pp.User.Position, -1, 500);
-            fx.PlayEffectGroupActorToActor(18678, pp.User, pp.User);
-
-            //Add 15% aps bonus for 4 sec
-            /*if (pp.User.internalGameAttributes["frenzyStack"].Value < 5)
+            if (pp.User.Properties.furyStack == 0)
             {
-                fx.ActorSetAttribute(pp.User, GameAttribute.Attacks_Per_Second_Total.Id, pp.User.gameAttributes[GameAttribute.Attacks_Per_Second_Total].ValueF + 0.15f, 4000, 1.2f);
-                fx.ActorSetInternalAttribute(pp.User, "frenzyStack", -1, 4000);
-                pp.User.internalGameAttributes["frenzyStack"] = new GameAttributeValue(pp.User.internalGameAttributes["frenzyStack"].Value + 1);
+                pm.fx.PlayEffectGroupActorToActor(18678, pp.User, pp.User);
             }
 
-            yield break;
+            pm.DoDamage(pp.Target, 30f, FloatingNumberMessage.FloatType.White);
+
+            //Add 15% aps bonus for 4 sec
+            if (pp.User.Properties.furyStack < 5)
+            {
+                pp.User.setAttribute(GameAttribute.Attacks_Per_Second_Total, new GameAttributeValue(pp.User.Attributes.GetAttributeValue(GameAttribute.Attacks_Per_Second_Total, null).ValueF + 0.15f));
+                pm.SendDWordTick(pp.User.InGameClient);
+                pp.User.Properties.furyStack++;
+            }
+
+            yield return 4000;
+
+            if (pp.User.Properties.furyStack > 0)
+            {
+
+                pp.User.setAttribute(GameAttribute.Attacks_Per_Second_Total, new GameAttributeValue(pp.User.Attributes.GetAttributeValue(GameAttribute.Attacks_Per_Second_Total, null).ValueF - 0.15f));
+                pm.SendDWordTick(pp.User.InGameClient);
+                pp.User.Properties.furyStack--;
+
+            }
+
+            Console.Write("Fury stack : " + pp.User.Properties.furyStack);
+
         }
     }
 
+    /*
     //[PowerImplementationAttribute(0x00013ECC/*Skills.Skills.Barbarian.FuryGenerator.Warcry*)]
     /*public class BarbarianWarCry : PowerImplementation
     {

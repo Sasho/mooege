@@ -52,6 +52,9 @@ namespace Mooege.Core.Common.Toons
         public D3.Hero.Digest Digest { get; private set; }
         public D3.Hero.VisualEquipment Equipment { get; private set; }
 
+        //Temp
+        public int furyStack = 0;
+
         public Account Owner { get; set; }
         
         public bool IsSelected

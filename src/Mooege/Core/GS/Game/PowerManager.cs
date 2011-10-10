@@ -209,7 +209,7 @@ namespace Mooege.Core.GS.Game
                     amount = player.Attributes[GameAttribute.Resource_Max, player.ResourceID] - player.Attributes[GameAttribute.Resource_Cur, player.ResourceID];
                 }
 
-                player.setAttribute(player.InGameClient, GameAttribute.Resource_Cur, new GameAttributeValue(amount + player.Attributes[GameAttribute.Resource_Cur, player.ResourceID]), player.ResourceID);
+                player.setAttribute(GameAttribute.Resource_Cur, new GameAttributeValue(amount + player.Attributes[GameAttribute.Resource_Cur, player.ResourceID]), player.ResourceID);
             }
             SendDWordTick(player.InGameClient);
         }
@@ -222,7 +222,7 @@ namespace Mooege.Core.GS.Game
                 {
                     amount = player.Attributes[GameAttribute.Resource_Cur, player.ResourceID];
                 }
-                player.setAttribute(player.InGameClient, GameAttribute.Resource_Cur, new GameAttributeValue(player.Attributes[GameAttribute.Resource_Cur, player.ResourceID] - amount), player.ResourceID);
+                player.setAttribute(GameAttribute.Resource_Cur, new GameAttributeValue(player.Attributes[GameAttribute.Resource_Cur, player.ResourceID] - amount), player.ResourceID);
             }
             SendDWordTick(player.InGameClient);
         }

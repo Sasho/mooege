@@ -155,12 +155,12 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.Damage_Min_Subtotal, 0xFFFFF] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Min_Total, 0xFFFFF] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 0xFFFFF] = 3.051758E-05f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_CurrentHand] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total_MainHand] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Total] = 1.199219f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_CurrentHand] = 1.2f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total_MainHand] = 1.2f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Total] = 1.2f;
             this.Attributes[GameAttribute.Attacks_Per_Second] = 1f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_MainHand] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total] = 1.199219f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_MainHand] = 1.2f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total] = 1.2f;
             this.Attributes[GameAttribute.Buff_Icon_End_Tick0, 0x00033C40] = 0x000003FB;
             this.Attributes[GameAttribute.Attacks_Per_Second_Item_Subtotal] = 3.051758E-05f;
             this.Attributes[GameAttribute.Attacks_Per_Second_Item] = 3.051758E-05f;
@@ -398,13 +398,13 @@ namespace Mooege.Core.GS.Player
 
         public void RegenRessource(float amount)
         {
-            setAttribute(this.InGameClient, GameAttribute.Resource_Cur, new GameAttributeValue(Math.Min(amount + this.Attributes[GameAttribute.Resource_Cur, this.ResourceID], this.Attributes[GameAttribute.Resource_Max, this.ResourceID])), this.ResourceID);
+            setAttribute(GameAttribute.Resource_Cur, new GameAttributeValue(Math.Min(amount + this.Attributes[GameAttribute.Resource_Cur, this.ResourceID], this.Attributes[GameAttribute.Resource_Max, this.ResourceID])), this.ResourceID);
             SendDWordTick();
         }
 
         public void UserRessource(float amount)
         {
-            setAttribute(this.InGameClient, GameAttribute.Resource_Cur, new GameAttributeValue(Math.Max(this.Attributes[GameAttribute.Resource_Cur, this.ResourceID] - amount, 0)), this.ResourceID);
+            setAttribute(GameAttribute.Resource_Cur, new GameAttributeValue(Math.Max(this.Attributes[GameAttribute.Resource_Cur, this.ResourceID] - amount, 0)), this.ResourceID);
             SendDWordTick();
         }
 

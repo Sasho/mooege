@@ -207,7 +207,7 @@ namespace Mooege.Core.GS.Actors
         #region setAttribute
 
         //HACK, work for the moment
-        public void setAttribute(GameClient playerClient, GameAttributeB attribute, GameAttributeValue value, int attributeKey = 0)
+        public void setAttribute(GameAttributeB attribute, GameAttributeValue value, int attributeKey = 0)
         {
             GameAttributeMap gam = new GameAttributeMap();
 
@@ -223,11 +223,14 @@ namespace Mooege.Core.GS.Actors
                 gam[attribute] = value.ValueB;
             }
 
-            gam.SendMessage(playerClient, this.DynamicID);
+            foreach (Mooege.Core.GS.Player.Player player in this.World.GetPlayersInRange(this.Position, 150f))
+            {
+                gam.SendMessage(player.InGameClient, this.DynamicID);                
+            }
         }
 
         //HACK, work for the moment
-        public void setAttribute(GameClient playerClient, GameAttributeI attribute, GameAttributeValue value, int attributeKey = 0)
+        public void setAttribute(GameAttributeI attribute, GameAttributeValue value, int attributeKey = 0)
         {
             GameAttributeMap gam = new GameAttributeMap();
 
@@ -243,11 +246,14 @@ namespace Mooege.Core.GS.Actors
                 gam[attribute] = value.Value;
             }
 
-            gam.SendMessage(playerClient, this.DynamicID);
+            foreach (Mooege.Core.GS.Player.Player player in this.World.GetPlayersInRange(this.Position, 150f))
+            {
+                gam.SendMessage(player.InGameClient, this.DynamicID);                
+            }
         }
 
         //HACK, work for the moment
-        public void setAttribute(GameClient playerClient, GameAttributeF attribute, GameAttributeValue value, int attributeKey = 0)
+        public void setAttribute(GameAttributeF attribute, GameAttributeValue value, int attributeKey = 0)
         {
             GameAttributeMap gam = new GameAttributeMap();
 
@@ -263,7 +269,10 @@ namespace Mooege.Core.GS.Actors
                 gam[attribute] = value.ValueF;
             }
 
-            gam.SendMessage(playerClient, this.DynamicID);
+            foreach(Mooege.Core.GS.Player.Player player in this.World.GetPlayersInRange(this.Position, 150f))
+            {
+                gam.SendMessage(player.InGameClient, this.DynamicID);
+            }
         }
         #endregion
 
