@@ -110,7 +110,6 @@ namespace Mooege.Core.GS.Powers
             //Update actor position
             actor.Position = pos;
         }
-        
 
         public void FaceTarget(Actor target, Actor actor)
         {

@@ -173,7 +173,7 @@ namespace Mooege.Net.GS.Message
         public static readonly GameAttributeI Crit_Percent_Base = new GameAttributeI(165, 0, -1, 0, 0, "", "", "Crit_Percent_Base", GameAttributeEncoding.Int, 9, 0, 0, 32);
         public static readonly GameAttributeI Crit_Percent_Bonus_Capped = new GameAttributeI(166, 0, -1, 0, 0, "", "", "Crit_Percent_Bonus_Capped", GameAttributeEncoding.Int, 9, 0, 0, 32);
         public static readonly GameAttributeI Crit_Percent_Bonus_Uncapped = new GameAttributeI(167, 0, -1, 0, 0, "", "", "Crit_Percent_Bonus_Uncapped", GameAttributeEncoding.Int, 9, 0, 0, 32);
-        public static readonly GameAttributeI Crit_Percent_Cap = new GameAttributeI(168, 0, -1, 0, 0, "", "", "Crit_Percent_Cap", GameAttributeEncoding.Int, 9, 0, 0, 32);
+        public static readonly GameAttributeI Crit_Percent_Cap = new GameAttributeI(168, 0, -1, 0, 0, "", "", "Crit_Percent_Cap", GameAttributeEncoding.Float16Or32, 9, 0, 0, 32);
         public static readonly GameAttributeI Crit_Damage_Percent = new GameAttributeI(169, 0, -1, 0, 0, "", "", "Crit_Damage_Percent", GameAttributeEncoding.Int, 9, 0, 0, 32);
         public static readonly GameAttributeI Crit_Effect_Time = new GameAttributeI(170, 0, -1, 3, 1, "", "", "Crit_Effect_Time", GameAttributeEncoding.Int, 9, 0, 0, 32);
         public static readonly GameAttributeF Pierce_Chance = new GameAttributeF(171, 0f, -1, 0, 0, "", "", "Pierce_Chance", GameAttributeEncoding.Float16, 9, 0f, 0f, 16);

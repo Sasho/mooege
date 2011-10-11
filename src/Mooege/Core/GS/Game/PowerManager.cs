@@ -13,6 +13,7 @@ using Mooege.Common.Helpers;
 using Mooege.Net.GS.Message.Definitions.Animation;
 using Mooege.Net.GS.Message;
 using Mooege.Net.GS.Message.Definitions.Effect;
+using Mooege.Net.GS.Message.Definitions.Text;
 using Mooege.Net.GS.Message.Definitions.Attribute;
 using Mooege.Net.GS.Message.Definitions.Player;
 using Mooege.Common;
@@ -233,6 +234,23 @@ namespace Mooege.Core.GS.Game
                 player.setAttribute(GameAttribute.Resource_Cur, new GameAttributeValue(amount + player.Attributes[GameAttribute.Resource_Cur, player.ResourceID]), player.ResourceID);
             }
             SendDWordTick(player.InGameClient);
+        }
+
+        public void notEnoughResources(Mooege.Core.GS.Player.Player player)
+        {
+            player.InGameClient.SendMessage(new DisplayGameTextMessage()
+            {
+                Id = 198,
+                Field0 = "You don't have enough resources",
+                Field1 = 1,
+                Field2 = 1
+            });
+            SendDWordTick(player.InGameClient);
+            player.InGameClient.SendMessage(new ANNDataMessage(Opcodes.ANNDataMessage13)
+            {
+                ActorID = player.DynamicID
+            });
+            flushAll(player);
         }
 
         public void userRessource(Mooege.Core.GS.Player.Player player, float amount)
