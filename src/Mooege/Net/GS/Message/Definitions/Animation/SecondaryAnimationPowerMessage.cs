@@ -40,7 +40,7 @@ namespace Mooege.Net.GS.Message.Definitions.Animation
             {
                 pos.X = player.Position.X + (float)RandomHelper.NextDouble() * 20f;
                 pos.Y = player.Position.Y + (float)RandomHelper.NextDouble() * 20f;
-                player.World.SpawnMob(player, 6652/*SNODatabase.Instance.RandomID(SNOGroup.NPCs)*/, pos);
+                player.World.SpawnMob(player, /*6652*/SNODatabase.Instance.RandomID(SNOGroup.NPCs), pos);
             }
         }
 

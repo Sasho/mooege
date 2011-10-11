@@ -40,6 +40,8 @@ namespace Mooege.Core.GS.Actors
         // TODO: Setter needs to update world. Also, this is probably an ACD field. /komiga
         public int AnimationSNO { get; set; }
 
+        private ActorAnimations.AnimSet _Animations;
+        public ActorAnimations.AnimSet Animations { get { if (_Animations == null) { _Animations = ActorAnimations.GetAnimSetByID(this.ActorSNO); } return _Animations; } }
         public Monster(World world, int actorSNO, Vector3D position)
             : base(world, world.NewActorID)
         {
@@ -58,8 +60,8 @@ namespace Mooege.Core.GS.Actors
             this.Field11 = 0x0;
             this.Field12 = 0x0;
             this.Field13 = 0x0;
-            this.AnimationSNO = 0x11150;
-
+            this.AnimationSNO = Animations.Idle;// 0x11150;
+            Console.WriteLine("Setting idle to" + Animations.Idle);
             this.Attributes[GameAttribute.Untargetable] = false;
             this.Attributes[GameAttribute.Uninterruptible] = true;
             this.Attributes[GameAttribute.Buff_Visual_Effect, 1048575] = true;
@@ -91,8 +93,31 @@ namespace Mooege.Core.GS.Actors
 
         public override void OnTargeted(Mooege.Core.GS.Player.Player player, TargetMessage message)
         {
+            //this.PlayAnimation(Animations.Hit);
             this.Die(player);
         }
+
+        public void PlayAnimation(int AnimationSNO)
+        {
+            this.World.BroadcastIfRevealed(new PlayAnimationMessage()
+            {
+                ActorID = this.DynamicID,
+                Field1 = 0xb,
+                Field2 = 0,
+                tAnim = new PlayAnimationMessageSpec[1]
+                {
+                    new PlayAnimationMessageSpec()
+                    {
+                        Field0 = 0x2,
+                        Field1 = AnimationSNO,
+                        Field2 = 0x0,
+                        Field3 = 1f
+                    }
+                }
+            }, this);
+
+        }
+
 
         public override bool Reveal(Mooege.Core.GS.Player.Player player)
         {
