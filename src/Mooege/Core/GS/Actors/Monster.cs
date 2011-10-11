@@ -95,6 +95,29 @@ namespace Mooege.Core.GS.Actors
 
         public override void OnTargeted(Mooege.Core.GS.Player.Player player, TargetMessage message)
         {
+            //this.Transform.Rotation.Amount = -1.0f * (float)Math.Atan2(this.Position.X - player.Position.X, this.Position.Y - player.Position.Y) - 20;
+            
+            //todo move this
+            /*this.World.BroadcastIfRevealed(new ACDTranslateFacingMessage()
+            {
+                ActorID = this.DynamicID,
+                Angle = -1.0f * (float)Math.Atan2(this.Position.X - player.Position.X, this.Position.Y - player.Position.Y) - 20,
+                Field2 = false
+            }, this );*/
+
+            // faces the player, Translatefacing doesnt work?
+            this.World.BroadcastIfRevealed(new ACDTranslateNormalMessage()
+            {
+                Field0 = (int)this.DynamicID,
+                Position = this.Position,
+                Id = 0x006E,
+                Angle = -1.0f * (float)Math.Atan2(this.Position.X - player.Position.X, this.Position.Y - player.Position.Y) - 20,
+                Field3 = false,
+                Field4 = 1.0f,
+                Field5 = 0,
+                Field6 = 69728
+
+            }, this);
             this.PlayAnimation(Animations.Hit);
             TakeDamage(player.Attributes[GameAttributeB.Damage_Min_Total] + (RandomHelper.Next(10)));
            
@@ -108,7 +131,7 @@ namespace Mooege.Core.GS.Actors
 
         public void TakeDamage(float damage)
         {
-            this.World.BroadcastIfRevealed(new PlayEffectMessage()
+            /*this.World.BroadcastIfRevealed(new PlayEffectMessage()
             {
                 ActorID = this.DynamicID,
                 Field1 = 0x0,
@@ -118,7 +141,7 @@ namespace Mooege.Core.GS.Actors
             {
                 ActorID = this.DynamicID,
                 Field1 = 0xc,
-            }, this);
+            }, this);*/
             this.World.BroadcastIfRevealed(new FloatingNumberMessage()
             {
                 ActorID = this.DynamicID,
@@ -144,10 +167,10 @@ namespace Mooege.Core.GS.Actors
                 {
                     new PlayAnimationMessageSpec()
                     {
-                        Field0 = 0x44,//0x2, // 0x2 seems to only play death?
+                        Field0 = 0x28,//0x44,//0x2, // 0x44 has a delay after say a hit animation 0x28 looks fine. somne kind of delay? - lotus
                         Field1 = Animation,
                         Field2 = 0x0, // 0x01 seems to not play stuff, plays death?
-                        Field3 = 1.121264f
+                        Field3 = 1f//1.121264f
                     }
                 }
             }, this);
