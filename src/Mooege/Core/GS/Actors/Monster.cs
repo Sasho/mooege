@@ -42,6 +42,8 @@ namespace Mooege.Core.GS.Actors
 
         private ActorAnimations.AnimSet _Animations;
         public ActorAnimations.AnimSet Animations { get { if (_Animations == null) { _Animations = ActorAnimations.GetAnimSetByID(this.ActorSNO); } return _Animations; } }
+        private float StartHP = 100;
+
         public Monster(World world, int actorSNO, Vector3D position)
             : base(world, world.NewActorID)
         {
@@ -61,7 +63,7 @@ namespace Mooege.Core.GS.Actors
             this.Field12 = 0x0;
             this.Field13 = 0x0;
             this.AnimationSNO = Animations.Idle;// 0x11150;
-            Console.WriteLine("Setting idle to" + Animations.Idle);
+            
             this.Attributes[GameAttribute.Untargetable] = false;
             this.Attributes[GameAttribute.Uninterruptible] = true;
             this.Attributes[GameAttribute.Buff_Visual_Effect, 1048575] = true;
@@ -78,11 +80,11 @@ namespace Mooege.Core.GS.Actors
             this.Attributes[GameAttribute.Buff_Active, 30283] = true;
             this.Attributes[GameAttribute.Buff_Active, 30290] = true;
 
-            this.Attributes[GameAttribute.Hitpoints_Max_Total] = 4.546875f;
+            this.Attributes[GameAttribute.Hitpoints_Max_Total] = StartHP;
             this.Attributes[GameAttribute.Buff_Active, 79486] = true;
-            this.Attributes[GameAttribute.Hitpoints_Max] = 4.546875f;
+            this.Attributes[GameAttribute.Hitpoints_Max] = StartHP;
             this.Attributes[GameAttribute.Hitpoints_Total_From_Level] = 0f;
-            this.Attributes[GameAttribute.Hitpoints_Cur] = 4.546875f;
+            this.Attributes[GameAttribute.Hitpoints_Cur] = StartHP;
             this.Attributes[GameAttribute.Invulnerable] = true;
             this.Attributes[GameAttribute.Buff_Active, 30582] = true;
             this.Attributes[GameAttribute.TeamID] = 10;
@@ -93,25 +95,59 @@ namespace Mooege.Core.GS.Actors
 
         public override void OnTargeted(Mooege.Core.GS.Player.Player player, TargetMessage message)
         {
-            //this.PlayAnimation(Animations.Hit);
-            this.Die(player);
+            this.PlayAnimation(Animations.Hit);
+            TakeDamage(player.Attributes[GameAttributeB.Damage_Min_Total] + (RandomHelper.Next(10)));
+           
+            //this.PlayAnimation(Animations.Animations[RandomHelper.Next(Animations.Animations.Count-1)]);
+            if (this.Attributes[GameAttributeB.Hitpoints_Cur] <= 0f)
+            {
+                this.Die(player);
+            }
+            //this.Die(player);
         }
 
-        public void PlayAnimation(int AnimationSNO)
+        public void TakeDamage(float damage)
         {
+            this.World.BroadcastIfRevealed(new PlayEffectMessage()
+            {
+                ActorID = this.DynamicID,
+                Field1 = 0x0,
+                Field2 = 0x2,
+            }, this);
+            this.World.BroadcastIfRevealed(new PlayEffectMessage()
+            {
+                ActorID = this.DynamicID,
+                Field1 = 0xc,
+            }, this);
+            this.World.BroadcastIfRevealed(new FloatingNumberMessage()
+            {
+                ActorID = this.DynamicID,
+                Number = damage,
+                Type = FloatingNumberMessage.FloatType.White,
+            }, this);
+            this.StartHP += -damage;
+            this.Attributes[GameAttributeB.Hitpoints_Cur] = StartHP;
+            GameAttributeMap attribs = new GameAttributeMap();
+            attribs[GameAttribute.Hitpoints_Cur] = StartHP;
+            foreach (var msg in attribs.GetMessageList(this.DynamicID))
+                this.World.BroadcastIfRevealed(msg, this);
+        }
+        public void PlayAnimation(int Animation)
+        {
+            //Console.WriteLine("Playing ANI: " + Animation.AniSNO + "  " + Animation.name);
             this.World.BroadcastIfRevealed(new PlayAnimationMessage()
             {
                 ActorID = this.DynamicID,
-                Field1 = 0xb,
+                Field1 = 0x6,//0x03,//0xb,
                 Field2 = 0,
                 tAnim = new PlayAnimationMessageSpec[1]
                 {
                     new PlayAnimationMessageSpec()
                     {
-                        Field0 = 0x2,
-                        Field1 = AnimationSNO,
-                        Field2 = 0x0,
-                        Field3 = 1f
+                        Field0 = 0x44,//0x2, // 0x2 seems to only play death?
+                        Field1 = Animation,
+                        Field2 = 0x0, // 0x01 seems to not play stuff, plays death?
+                        Field3 = 1.121264f
                     }
                 }
             }, this);
