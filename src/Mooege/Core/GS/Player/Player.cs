@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
@@ -33,6 +34,7 @@ using Mooege.Net.GS.Message.Fields;
 using Mooege.Net.GS.Message.Definitions.Combat;
 using Mooege.Net.GS.Message.Definitions.Hero;
 using Mooege.Net.GS.Message.Definitions.Misc;
+using Mooege.Net.GS.Message.Definitions.Animation;
 using Mooege.Net.GS.Message.Definitions.Player;
 using Mooege.Net.GS.Message.Definitions.Skill;
 using Mooege.Net.GS.Message.Definitions.Inventory;
@@ -144,7 +146,7 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.IsTrialActor] = true;
             this.Attributes[GameAttribute.Buff_Visual_Effect, 0xFFFFF] = true;
             this.Attributes[GameAttribute.Crit_Percent_Cap] = 0x3F400000;
-            this.Attributes[GameAttribute.Resource_Cur, this.ResourceID] = 200f;
+            this.Attributes[GameAttribute.Resource_Cur, this.ResourceID] = 100f;
             this.Attributes[GameAttribute.Resource_Max, this.ResourceID] = 200f;
             this.Attributes[GameAttribute.Resource_Max_Total, this.ResourceID] = 200f;
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total_All] = 2f;
@@ -154,12 +156,12 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.Damage_Min_Subtotal, 0xFFFFF] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Min_Total, 0xFFFFF] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 0xFFFFF] = 3.051758E-05f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_CurrentHand] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total_MainHand] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Total] = 1.199219f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_CurrentHand] = 1.2f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total_MainHand] = 1.2f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Total] = 1.2f;
             this.Attributes[GameAttribute.Attacks_Per_Second] = 1f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_MainHand] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total] = 1.199219f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_MainHand] = 1.2f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total] = 1.2f;
             this.Attributes[GameAttribute.Buff_Icon_End_Tick0, 0x00033C40] = 0x000003FB;
             this.Attributes[GameAttribute.Attacks_Per_Second_Item_Subtotal] = 3.051758E-05f;
             this.Attributes[GameAttribute.Attacks_Per_Second_Item] = 3.051758E-05f;
@@ -262,7 +264,8 @@ namespace Mooege.Core.GS.Player
             if (message is AssignActiveSkillMessage) OnAssignActiveSkill(client, (AssignActiveSkillMessage)message);
             else if (message is AssignPassiveSkillMessage) OnAssignPassiveSkill(client, (AssignPassiveSkillMessage)message);
             else if (message is PlayerChangeHotbarButtonMessage) OnPlayerChangeHotbarButtonMessage(client, (PlayerChangeHotbarButtonMessage)message);
-            else if (message is TargetMessage) OnObjectTargeted(client, (TargetMessage)message);
+            else if (message is TargetMessage) OnObjectTargeted(client, message);
+            else if (message is SecondaryAnimationPowerMessage) OnObjectTargeted(client, message);
             else return;
 
             UpdateState();
@@ -331,17 +334,16 @@ namespace Mooege.Core.GS.Player
         }
 
         // Message handlers
-        private void OnObjectTargeted(GameClient client, TargetMessage message)
+        private void OnObjectTargeted(GameClient client, GameMessage message)
         {
-            Actor actor = this.World.GetActor(message.TargetID);
+            /*Actor actor = this.World.GetActor(message.TargetID);
             if (actor != null)
-            {
+
                 actor.OnTargeted(this, message);
-            }
             else
-            {
-                //Logger.Warn("Player targeted an invalid object (ID = {0})", message.TargetID);
-            }
+                Logger.Warn("Player targeted an invalid object (ID = {0})", message.TargetID);*/
+
+            this.World.Game.PowerManager.Manage(this, message);
         }
 
         private void OnPlayerChangeHotbarButtonMessage(GameClient client, PlayerChangeHotbarButtonMessage message)
@@ -373,6 +375,28 @@ namespace Mooege.Core.GS.Player
                 State = this.GetStateData()
             });
 
+            this.InGameClient.PacketId += 10 * 2;
+            this.InGameClient.SendMessage(new DWordDataMessage()
+            {
+                Id = 0x89,
+                Field0 = this.InGameClient.PacketId,
+            });
+        }
+
+        public void RegenRessource(float amount)
+        {
+            setAttribute(GameAttribute.Resource_Cur, new GameAttributeValue(Math.Min(amount + this.Attributes[GameAttribute.Resource_Cur, this.ResourceID], this.Attributes[GameAttribute.Resource_Max, this.ResourceID])), this.ResourceID);
+            SendDWordTick();
+        }
+
+        public void UserRessource(float amount)
+        {
+            setAttribute(GameAttribute.Resource_Cur, new GameAttributeValue(Math.Max(this.Attributes[GameAttribute.Resource_Cur, this.ResourceID] - amount, 0)), this.ResourceID);
+            SendDWordTick();
+        }
+
+        public void SendDWordTick()
+        {
             this.InGameClient.PacketId += 10 * 2;
             this.InGameClient.SendMessage(new DWordDataMessage()
             {

@@ -18,34 +18,42 @@
 
 using System;
 using Mooege.Common.Helpers;
+using Mooege.Core.GS.Game;
 using Mooege.Core.GS.Map;
+using Mooege.Core.GS.Actors;
+using Mooege.Net.GS;
 using Mooege.Net.GS.Message;
-using Mooege.Net.GS.Message.Definitions.World;
 using Mooege.Net.GS.Message.Fields;
+using Mooege.Net.GS.Message.Definitions.ACD;
 using Mooege.Net.GS.Message.Definitions.Animation;
+using Mooege.Net.GS.Message.Definitions.Attribute;
+using Mooege.Net.GS.Message.Definitions.Combat;
 using Mooege.Net.GS.Message.Definitions.Effect;
 using Mooege.Net.GS.Message.Definitions.Misc;
+using Mooege.Net.GS.Message.Definitions.World;
 
 namespace Mooege.Core.GS.Actors
 {
-    public class Monster : Actor
+    public class Proxy : Actor
     {
         public override ActorType ActorType { get { return ActorType.Monster; } }
 
         // TODO: Setter needs to update world. Also, this is probably an ACD field. /komiga
         public int AnimationSNO { get; set; }
 
-        public Monster(World world, int actorSNO, Vector3D position)
+        public Proxy(World world, int actorSNO, Vector3D position, float scale = 1.35f)
             : base(world, world.NewActorID)
         {
             this.ActorSNO = actorSNO;
             // FIXME: This is hardcoded crap
             this.Field2 = 0x8;
             this.Field3 = 0x0;
-            this.Scale = 1.35f;
+            this.Scale = scale;
             this.Position.Set(position);
-            this.RotationAmount = (float)(RandomHelper.NextDouble() * 2.0f * Math.PI);
-            this.RotationAxis.X = 0f; this.RotationAxis.Y = 0f; this.RotationAxis.Z = 1f;
+            this.RotationAmount = scale;
+            this.RotationAxis.X = 0f;
+            this.RotationAxis.Y = 0f;
+            this.RotationAxis.Z = 1f;
             this.GBHandle.Type = (int)GBHandleType.Monster; this.GBHandle.GBID = 1;
             this.Field7 = 0x00000001;
             this.Field8 = this.ActorSNO;
@@ -80,7 +88,6 @@ namespace Mooege.Core.GS.Actors
             this.Attributes[GameAttribute.Buff_Active, 30582] = true;
             this.Attributes[GameAttribute.TeamID] = 10;
             this.Attributes[GameAttribute.Level] = 1;
-            this.Attributes[GameAttribute.Experience_Granted] = 525;
 
             this.World.Enter(this); // Enter only once all fields have been initialized to prevent a run condition
         }
@@ -146,9 +153,6 @@ namespace Mooege.Core.GS.Actors
                     0x2cda,
                     0x2cd9
             };
-
-            player.UpdateExp(this.Attributes[GameAttribute.Experience_Granted]);
-
             this.World.BroadcastIfRevealed(new PlayEffectMessage()
             {
                 ActorID = this.DynamicID,

@@ -18,6 +18,8 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using Mooege.Common;
@@ -38,6 +40,8 @@ namespace Mooege.Core.GS.Game
 
         public int GameId { get; private set; }
 
+        public PowerManager PowerManager { get; private set; }
+
         public ConcurrentDictionary<GameClient, Player.Player> Players = new ConcurrentDictionary<GameClient, Player.Player>();
 
         public int PlayerIndexCounter = -1;
@@ -48,7 +52,10 @@ namespace Mooege.Core.GS.Game
         public int StartWorldSNO { get; private set; }
         public World StartWorld { get { return GetWorld(this.StartWorldSNO); } }
 
-        private readonly WorldGenerator _worldGenerator;
+        public readonly int TicksPerSecond = 30;
+        private Thread _tickThread;
+
+        private readonly WorldGenerator WorldGenerator;
 
         private uint _lastObjectID = 0x00000001;
         private uint _lastSceneID  = 0x04000000;
@@ -64,8 +71,27 @@ namespace Mooege.Core.GS.Game
             this.GameId = gameId;
             this._objects = new Dictionary<uint, DynamicObject>();
             this._worlds = new Dictionary<int, World>();
-            this._worldGenerator = new WorldGenerator(this);
-            this.StartWorldSNO = 71150; // FIXME: This must be set according to the game settings (start quest/act). Better yet, track the player's save point and toss this stuff
+            this.WorldGenerator = new WorldGenerator(this);
+            this.PowerManager = new PowerManager(this);
+            // FIXME: This must be set according to the game settings (start quest/act). Better yet, track the player's save point and toss this stuff
+            this.StartWorldSNO = 71150;
+
+            //Quick implementation of gametick
+            _tickThread = new Thread(() => _tickThread_Run());
+            _tickThread.Start();
+        }
+
+        public void _tickThread_Run()
+        {
+            // TODO: needs to have exit condition, probably either PlayerManager.Players.Count or a manual shutdown flag
+            while (true)
+            {
+                lock (this)
+                {
+                    PowerManager.Tick();
+                }
+                Thread.Sleep(1000 / TicksPerSecond);
+            }
         }
 
         public void Route(GameClient client, GameMessage message)
@@ -186,7 +212,7 @@ namespace Mooege.Core.GS.Game
             // If it doesn't exist, try to load it
             if (world == null)
             {
-                world = this._worldGenerator.GenerateWorld(worldSNO);
+                world = this.WorldGenerator.GenerateWorld(worldSNO);
                 if (world == null)
                     Logger.Warn(String.Format("Failed to generate world (SNO = {0})", worldSNO));
             }

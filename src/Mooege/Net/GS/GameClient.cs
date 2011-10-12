@@ -66,7 +66,8 @@ namespace Mooege.Net.GS
 
                 while ((end - _incomingBuffer.Position) >= 9)
                 {
-                    var message = _incomingBuffer.ParseMessage();
+                    GameMessage message = _incomingBuffer.ParseMessage();
+
                     if (message == null) continue;
                     try
                     {
